@@ -222,6 +222,7 @@ function Transcript({
           className="flex-1 px-4 py-2 focus:outline-none"
           placeholder="Type a message..."
         />
+
         <button
           onClick={onSendMessage}
           disabled={!canSend || !userText.trim()}

@@ -1,5 +1,7 @@
 import { CampusVue } from "@/app/api/campusvue/campusvue";
 import { AgentConfig } from "@/app/types";
+import sendCode from "@/app/api/twilio/twilio";
+const verificationStore = new Map<string, string>();
 
 const authentication: AgentConfig = {
   name: "authentication",
@@ -8,7 +10,7 @@ const authentication: AgentConfig = {
   instructions: `
 # Personality and Tone
 ## Identity
-You are a calm, professional MALE support agent for Pacific College with a deep voice. You’ve worked in higher education support for years and are great at helping students feel at ease.
+You’re a chill, professional male IT support guy at Pacific College — think deep voice, easygoing vibe, knows his stuff. You've been in higher ed support for years, so you’ve seen it all and nothing rattles you. You’re great at walking students through tech issues without making them feel dumb. You keep things calm, simple, and friendly — just helping folks get through their day with as little stress as possible.
 
 ## Demeanor
 You're attentive and easy to talk to—professional but not stiff. You show students you're here to help, and you listen carefully before guiding them.
@@ -24,9 +26,11 @@ You will go through the following steps:
 1. **Greeting** — Welcome the student and mention you're here to help.
 2. **Ask for their issue** — “Can you tell me a bit about what you’re needing help with today?”
 3. **Ask clarifying questions** to pinpoint which team the issue falls under (e.g., financial aid, registrar, tech support, admissions, online learning).
-4. **Begin verification** — You’ll ask for full name.
-5. **Call the 'authenticate_user_information' tool** using full name.
-6. From 'authenticate_user_information' tool give the student back its phone number.
+4. **Begin verification** — You’ll ask for full name and phone number.
+5. **Call the 'authenticate_user_information' tool** using full name and phone number.
+6. **Ask the student to provide their phone number for verification.**
+7. **Compare the provided phone number with the one on file.**
+8. If they match, then send a verification code to the student’s phone number using the 'verify_code' they will have to enter the code to verify.
 
 # Routing Logic
 Based on the student’s responses, match their issue to one of these internal agents:
@@ -47,10 +51,7 @@ When they provide:
 Once you have:
 - full name
 
-Call \`authenticate_user_information\`. During the call when the student gives you their name.
-
-# Final step
-Once verified and the issue is understood, give the student back their information back, its phone number.
+Call \`authenticate_user_information\`. During the call when the student gives you their name and phone number.
 
 Do NOT try to solve their problem yourself. Your job is to get them to the right person after verifying identity and understanding their situation.
 `,
@@ -66,28 +67,75 @@ Do NOT try to solve their problem yourself. Your job is to get them to the right
             type: "string",
             description: "Full legal name of the student.",
           },
+          phone_number: {
+            type: "string",
+            description:
+              "Phone number provided by the student for verification.",
+          },
         },
-        required: ["full_name"],
+        required: ["full_name", "phone_number"],
+        additionalProperties: false,
+      },
+    },
+    {
+      type: "function",
+      name: "verify_code",
+      description:
+        "Verifies the student's identity using a code sent via SMS or email.",
+      parameters: {
+        type: "object",
+        properties: {
+          code: {
+            type: "string",
+            description:
+              "The 6-digit code the student received via SMS or email.",
+          },
+          phone_number: {
+            type: "string",
+            description: "Phone number to verify against stored session.",
+          },
+        },
+        required: ["code", "phone_number"],
         additionalProperties: false,
       },
     },
   ],
   toolLogic: {
     // New logic to query the API and verify user information
-    authenticate_user_information: async ({ full_name }) => {
+    authenticate_user_information: async ({ full_name, phone_number }) => {
       const campusVue = new CampusVue();
 
       try {
-        // Query the API to find the student by name
         const result = await campusVue.queryAnthologyByName(full_name);
-
-        // Extract the first student's phone number from the result
         const student = result.value[0];
-        const phoneNumber = student.PhoneNumber?.trim() || "Not available";
-        return {
-          phoneNumber,
-          message: `Your phone number on file is: ${phoneNumber}`,
-        };
+        const phoneOnFile = student.PhoneNumber?.replace(/\D/g, "");
+        const providedPhone = phone_number.replace(/\D/g, "");
+
+        if (
+          phoneOnFile &&
+          providedPhone &&
+          phoneOnFile.endsWith(providedPhone)
+        ) {
+          const verificationCode = Math.floor(
+            100000 + Math.random() * 900000
+          ).toString();
+
+          // Store code with phone number
+          verificationStore.set(providedPhone, verificationCode);
+
+          const twilio = await sendCode(verificationCode);
+          console.log("Twilio response:", twilio);
+          return {
+            verified: true,
+            message: "Your identity has been verified. Thank you!",
+          };
+        } else {
+          return {
+            verified: false,
+            message:
+              "The phone number you provided does not match our records. Please try again or contact support.",
+          };
+        }
       } catch (error) {
         console.error("Error during authentication:", error);
         return {
@@ -95,6 +143,22 @@ Do NOT try to solve their problem yourself. Your job is to get them to the right
             "There was an issue verifying your identity. Please try again.",
         };
       }
+    },
+    verify_code: async ({ code, phone_number }) => {
+      const storedCode = verificationStore.get(phone_number.replace(/\D/g, ""));
+
+      if (storedCode === code) {
+        verificationStore.delete(phone_number); // clean up
+        return {
+          verified: true,
+          message: "Verification successful. You're now authenticated.",
+        };
+      }
+
+      return {
+        verified: false,
+        message: "Invalid code. Please try again.",
+      };
     },
   },
 };
