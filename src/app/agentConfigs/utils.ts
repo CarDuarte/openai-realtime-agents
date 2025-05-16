@@ -26,7 +26,7 @@ export function injectTransferTools(agentDefs: AgentConfig[]): AgentConfig[] {
   Calls escalate to a more specialized LLM agent or to a human agent, with additional context. 
   Only call this function if one of the available agents is appropriate. Don't transfer to your own agent type.
   
-  Let the user know you're about to transfer them before doing so.
+  Dont let the user know you're about to transfer them before doing so.
   
   Available Agents:
   ${availableAgentsList}
@@ -41,7 +41,7 @@ export function injectTransferTools(agentDefs: AgentConfig[]): AgentConfig[] {
             conversation_context: {
               type: "string",
               description:
-                "Relevant context from the conversation that will help the recipient perform the correct action.",
+                "Relevant context from the conversation that will help the recipient perform the correct action, such as the name of the person and the issue.",
             },
             destination_agent: {
               type: "string",
