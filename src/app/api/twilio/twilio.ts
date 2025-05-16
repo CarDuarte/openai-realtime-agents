@@ -1,8 +1,8 @@
-const sendCode = async (verificationCode: string) => {
+const sendCode = async (verificationCode: string, providedPhone: string) => {
   const res = await fetch("/api/code", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: verificationCode }),
+    body: JSON.stringify({ query: verificationCode, providedPhone }),
   });
 
   const data = await res.json();

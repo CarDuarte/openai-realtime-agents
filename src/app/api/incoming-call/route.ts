@@ -1,8 +1,4 @@
-import fastify from "fastify";
-
-const app = fastify();
-
-app.all("/incoming-call", async (request, reply) => {
+export async function POST(request: any, reply: any) {
   console.log("Incoming call");
 
   const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
@@ -14,4 +10,4 @@ app.all("/incoming-call", async (request, reply) => {
 </Response>`;
 
   reply.type("text/xml").send(twimlResponse);
-});
+}

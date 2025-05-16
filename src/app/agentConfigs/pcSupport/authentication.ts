@@ -123,7 +123,7 @@ Do NOT try to solve their problem yourself. Your job is to get them to the right
           // Store code with phone number
           verificationStore.set(providedPhone, verificationCode);
 
-          const twilio = await sendCode(verificationCode);
+          const twilio = await sendCode(verificationCode, providedPhone);
           console.log("Twilio response:", twilio);
           return {
             verified: true,
