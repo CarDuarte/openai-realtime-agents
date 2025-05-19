@@ -23,14 +23,11 @@ export async function POST() {
 <Response>
   <Say>Hi, you're being connected to the Pacific College AI assistant.</Say>
   <Connect>
-    <Stream url="wss://twilio-websocket-server-xziu.onrender.com/media-stream" name="${sessionId}" />
-
+    <Stream url="wss://twilio-websocket-server-xziu.onrender.com/media-stream/${sessionId}" />
   </Connect>
 </Response>`;
 
-  console.log(
-    `wss://twilio-websocket-server-xziu.onrender.com/media-stream?session=${sessionId}`
-  );
+  console.log(twimlResponse);
 
   return new Response(twimlResponse, {
     headers: { "Content-Type": "text/xml" },
