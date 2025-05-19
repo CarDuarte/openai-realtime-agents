@@ -31,6 +31,5 @@ export async function POST() {
 
   return new Response(twimlResponse, {
     headers: { "Content-Type": "text/xml" },
-    status: 200,
   });
 }
