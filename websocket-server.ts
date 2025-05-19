@@ -8,8 +8,18 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/media-stream" });
 
 wss.on("connection", (ws, req) => {
-  const params = new URLSearchParams(req.url?.split("?")[1]);
-  const sessionId = params.get("session");
+  console.log("🔍 req.url:", req.url);
+  console.log("🔍 req.headers:", req.headers);
+  const url = new URL(req.url ?? "", `http://${req.headers.host}`);
+  const sessionId = url.searchParams.get("session");
+  const host = req.headers.host;
+  const fullPath = req.url;
+  const queryFromHeader =
+    req.headers["x-original-uri"] || req.headers["x-forwarded-uri"];
+
+  console.log("🧩 Full URL path:", fullPath);
+  console.log("🧩 Host path:", host);
+  console.log("🧩 Query from header:", queryFromHeader);
 
   if (!sessionId) {
     console.error("❌ Missing session ID in WebSocket URL.");
@@ -18,7 +28,7 @@ wss.on("connection", (ws, req) => {
   }
 
   (ws as any).sessionId = sessionId;
-  console.log("🔌 Twilio stream connected with session:", sessionId);
+  console.log("✅ Twilio stream connected with session:", sessionId);
 
   ws.on("message", async (message) => {
     const data = JSON.parse(message.toString());

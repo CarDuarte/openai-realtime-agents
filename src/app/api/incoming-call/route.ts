@@ -23,7 +23,8 @@ export async function POST() {
 <Response>
   <Say>Hi, you're being connected to the Pacific College AI assistant.</Say>
   <Connect>
-    <Stream url="wss://twilio-websocket-server-xziu.onrender.com/media-stream?session=${sessionId}" />
+    <Stream url="wss://twilio-websocket-server-xziu.onrender.com/media-stream" name="${sessionId}" />
+
   </Connect>
 </Response>`;
 
