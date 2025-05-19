@@ -1,16 +1,18 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import twilio from "twilio";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function POST() {
   const twiml = new twilio.twiml.VoiceResponse();
 
   twiml.say("Hi, you have called Pacific College support. Connecting you now.");
 
-  // NOTE: You can use a static stream URL, or dynamically build it using req.headers.host
   twiml.connect().stream({
-    url: `wss://${req.headers.host}/media-stream`,
+    url: "wss://twilio-websocket-server-xziu.onrender.com/media-stream",
   });
 
-  res.setHeader("Content-Type", "text/xml");
-  res.status(200).send(twiml.toString());
+  return new Response(twiml.toString(), {
+    headers: {
+      "Content-Type": "text/xml",
+    },
+    status: 200,
+  });
 }
