@@ -1,5 +1,5 @@
 const recieveCall = async () => {
-  const res = await fetch("/api/incoming-call", {
+  const res = await fetch("/incoming-call", {
     method: "POST",
   });
 
