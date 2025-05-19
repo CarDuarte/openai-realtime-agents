@@ -1,5 +1,3 @@
-import twilio from "twilio";
-
 export async function POST() {
   // Create a new session
   const sessionResponse = await fetch(
@@ -21,13 +19,17 @@ export async function POST() {
 
   console.log("✅ OpenAI session created:", sessionId);
 
+  const twilio = await import("twilio");
   const twiml = new twilio.twiml.VoiceResponse();
-
   twiml.say("Hi, you're being connected to the Pacific College AI assistant.");
 
   twiml.connect().stream({
     url: `wss://twilio-websocket-server-xziu.onrender.com/media-stream?session=${sessionId}`,
   });
+
+  console.log(
+    `wss://twilio-websocket-server-xziu.onrender.com/media-stream?session=${sessionId}`
+  );
 
   return new Response(twiml.toString(), {
     headers: { "Content-Type": "text/xml" },
