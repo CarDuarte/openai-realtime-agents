@@ -19,8 +19,8 @@ export async function POST() {
 
   console.log("✅ OpenAI session created:", sessionId);
 
-  const twilio = await import("twilio");
-  const twiml = new twilio.twiml.VoiceResponse();
+  const { twiml: Twiml } = await import("twilio");
+  const twiml = new Twiml.VoiceResponse();
   twiml.say("Hi, you're being connected to the Pacific College AI assistant.");
 
   twiml.connect().stream({
