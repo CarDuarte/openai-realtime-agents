@@ -23,7 +23,7 @@ export async function POST() {
 <Response>
   <Say>Hi, you're being connected to the Pacific College AI assistant.</Say>
   <Connect>
-    <Stream url="wss://twilio-websocket-server-xziu.onrender.com/media-stream/${sessionId}" />
+    <Stream url="wss://twilio-websocket-server-production-7ac1.up.railway.app/media-stream/${sessionId}" />
   </Connect>
 </Response>`;
 
@@ -31,6 +31,6 @@ export async function POST() {
 
   return new Response(twimlResponse, {
     headers: { "Content-Type": "text/xml" },
-    status: 200,
+    status: 101,
   });
 }
