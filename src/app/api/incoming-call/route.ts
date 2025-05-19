@@ -19,19 +19,19 @@ export async function POST() {
 
   console.log("✅ OpenAI session created:", sessionId);
 
-  const { twiml: Twiml } = await import("twilio");
-  const twiml = new Twiml.VoiceResponse();
-  twiml.say("Hi, you're being connected to the Pacific College AI assistant.");
-
-  twiml.connect().stream({
-    url: `wss://twilio-websocket-server-xziu.onrender.com/media-stream?session=${sessionId}`,
-  });
+  const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say>Hi, you're being connected to the Pacific College AI assistant.</Say>
+  <Connect>
+    <Stream url="wss://twilio-websocket-server-xziu.onrender.com/media-stream?session=${sessionId}" />
+  </Connect>
+</Response>`;
 
   console.log(
     `wss://twilio-websocket-server-xziu.onrender.com/media-stream?session=${sessionId}`
   );
 
-  return new Response(twiml.toString(), {
+  return new Response(twimlResponse, {
     headers: { "Content-Type": "text/xml" },
     status: 200,
   });
