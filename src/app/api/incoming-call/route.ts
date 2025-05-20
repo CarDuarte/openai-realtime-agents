@@ -19,17 +19,11 @@ export async function POST() {
 
   console.log("✅ OpenAI session created:", sessionId);
 
-  const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say>Hi, you're being connected to the Pacific College AI assistant.</Say>
-  <Connect>
-    <Stream url="wss://1bbb-181-115-34-162.ngrok-free.app/media-stream" name="${sessionId}" />
-  </Connect>
-</Response>`;
+  const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Hi, you're being connected to the Pacific College AI assistant.</Say><Connect><Stream url="wss://1bbb-181-115-34-162.ngrok-free.app/media-stream" name="${sessionId}" track="inbound" /></Connect></Response>`;
 
   console.log(twimlResponse);
 
   return new Response(twimlResponse, {
-    headers: { "Content-Type": "text/xml" },
+    headers: { "Content-Type": "application/xml" },
   });
 }
