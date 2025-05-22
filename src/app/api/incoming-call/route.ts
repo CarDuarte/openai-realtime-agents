@@ -23,7 +23,7 @@ export async function POST() {
 <Response>
   <Say>Hi, you're being connected to the Pacific College AI assistant.</Say>
   <Connect>
-    <Stream url="wss://241e-181-115-34-162.ngrok-free.app/media-stream">
+    <Stream url="wss://e62c-181-115-34-162.ngrok-free.app/media-stream">
       <Parameter name="SessionId" value="${sessionId}" />
     </Stream>
   </Connect>
