@@ -21,12 +21,11 @@ export async function POST() {
 
   const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Start>
+  <Connect>
     <Stream url="wss://e62c-181-115-34-162.ngrok-free.app/media-stream">
       <Parameter name="SessionId" value="your-session-id-here" />
     </Stream>
-  </Start>
-  <Say>Hi, you're being connected to the Pacific College AI assistant.</Say>
+  </Connect>
   <Pause length="60" />
 </Response>`;
 
