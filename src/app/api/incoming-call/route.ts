@@ -22,7 +22,7 @@ export async function POST() {
   const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
-    <Stream url="wss://974c-181-115-34-162.ngrok-free.app/media-stream">
+    <Stream url="wss://dda0-181-115-34-162.ngrok-free.app/media-stream">
       <Parameter name="SessionId" value="your-session-id-here" />
     </Stream>
   </Connect>
